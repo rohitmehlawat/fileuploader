@@ -6,19 +6,17 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
+import com.example.model.FileData;
+
+
 
 @RestController
 @RequestMapping("/storage/")
@@ -34,7 +32,7 @@ public class BucketController {
 
     @PostMapping("/uploadFile")
     public String uploadFile(@RequestPart(value = "file") MultipartFile[] files) {
-    	boolean flag=false;
+    	boolean flag=true;
     	for(MultipartFile file:files) {
     		String url=this.amazonClient.uploadFile(file);
     		if(!url.isEmpty()) {
@@ -49,14 +47,14 @@ public class BucketController {
     	}
     	else {
     		return "failure";
-    	}
-    	
-    	
-    	
+    	}  	
     }
-
-    @DeleteMapping("/deleteFile")
-    public String deleteFile(@RequestPart(value = "url") String fileUrl) {
-        return this.amazonClient.deleteFileFromS3Bucket(fileUrl);
+    
+    @PostMapping("/uploadData")
+    public String uploadData(@ModelAttribute FileData file ) {
+    	String url=this.amazonClient.uploadFile(file.getFile());
+    	return file.getId();
     }
+    
+    
 }
